@@ -1,41 +1,26 @@
 #include <bits/stdc++.h>
 using namespace std;
-struct Edge {
-    int u, v, c;
-};
-int lab[100];
-int find_root(int u) {
-    if (lab[u] < 0) return u;
-    return lab[u] = find_root(lab[u]);
+int minKey(int key[], bool mstSet[]){
+    int min = INT_MAX, min_index;
+    for (int v = 0; v < V; v++)
+        if (!mstSet[v] && key[v] < min)
+            min = key[v], min_index = v;
+    return min_index;
 }
-void union_trees(int u, int v) {
-    u = find_root(u);
-    v = find_root(v);
-    if (u == v) return;
-
-    if (lab[u] > lab[v]) swap(u, v);
-    lab[u] += lab[v];
-    lab[v] = u;
-}
-
-bool cmp(const Edge& a, const Edge& b) {
-    return a.c < b.c;
-}
-int kruskal(vector<Edge>& edges, int n) {
-
-    for (int i = 1; i <= n; i++) lab[i] = -1;
-    sort(edges.begin(), edges.end(), cmp);
-    int mst_weight = 0, cnt = 0;
-    for (auto &e : edges) {
-        if (find_root(e.u) != find_root(e.v)) {
-            union_trees(e.u, e.v);
-            mst_weight += e.c;
-            cnt++;
-            if (cnt == n - 1) break;
-        }
+void primMST(int graph[V][V], int parent[]){
+    int key[V];
+    bool mstSet[V];
+    for (int i = 0; i < V; i++)
+        key[i] = INT_MAX, mstSet[i] = false;
+    key[0] = 0;
+    parent[0] = -1;
+    for (int count = 0; count < V - 1; count++){
+        int u = minKey(key, mstSet);
+        mstSet[u] = true;
+        for (int v = 0; v < V; v++)
+            if (graph[u][v] && !mstSet[v] && graph[u][v] < key[v])
+                parent[v] = u, key[v] = graph[u][v];
     }
-
-    if (cnt == n - 1) return mst_weight;
-    return -1;
 }
+
 
